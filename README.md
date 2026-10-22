@@ -4,374 +4,719 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>고령층 디지털 소외 체감 시뮬레이터</title>
+  <title>디지털 소외 계층 키오스크 체험 - Light Single View Simulator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-    }
-
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700&display=swap');
     body {
-      background-color: #f0f2f5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 10px;
-      min-height: 100vh;
+      font-family: 'Noto Sans KR', sans-serif;
+      user-select: none;
+      background-color: #ffffff;
+      color: #0f172a;
     }
 
-    /* 상단 컨트롤 패널 */
-    .control-panel {
-      background: #ffffff;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 360px;
-      margin-bottom: 15px;
-      text-align: center;
+    /* 고령층 시야 특수 효과 - 약한 Blur & 작은 글씨 (밝은 화면 고정) */
+    .elderly-view {
+      filter: blur(1.0px) contrast(98%) brightness(102%);
+      font-size: 0.75rem !important; /* 작은 글씨 */
+      transform-origin: center center;
     }
 
-    .control-panel h2 {
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: #333;
-    }
-
-    .toggle-group {
-      display: flex;
-      justify-content: space-around;
-      gap: 10px;
-    }
-
-    .toggle-btn {
-      flex: 1;
-      padding: 8px 5px;
-      font-size: 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #f8f9fa;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.2s;
-    }
-
-    .toggle-btn.active {
-      background: #d9534f;
-      color: white;
-      border-color: #d9534f;
-    }
-
-    /* 스마트폰 프레임 */
-    .phone-container {
-      width: 100%;
-      max-width: 360px;
-      height: 580px;
-      background: #ffffff;
-      border: 10px solid #222;
-      border-radius: 36px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    }
-
-    /* 노화 필터 효과 */
-    .phone-screen {
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      transition: filter 0.3s;
-    }
-
-    /* [시각 제약] 흐릿함 + 저대비 */
-    .aging-vision {
-      filter: blur(2.2px) contrast(65%) brightness(95%);
-    }
-
-    /* 화면 상단 미션 안내 */
-    .mission-header {
-      background: #2b3e50;
-      color: #fff;
-      padding: 12px;
-      font-size: 12px;
-      text-align: center;
-      line-height: 1.4;
-    }
-
-    .mission-header span {
-      color: #ffeb3b;
-      font-weight: bold;
-    }
-
-    /* 미션 1: 키오스크 화면 */
-    .kiosk-app {
-      padding: 15px;
-    }
-
-    .app-title {
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      text-align: center;
-      color: #444;
-    }
-
-    .menu-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-
-    .menu-item {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 8px;
-      text-align: center;
-      background: #fafafa;
-    }
-
-    /* 노년층이 보기 어려운 저대비/작은 글씨 UI 디자인 */
-    .menu-item .title {
-      font-size: 10px; /* 매우 작은 글씨 */
-      color: #999; /* 낮은 대비 */
-      margin-bottom: 4px;
-    }
-
-    .menu-item .price {
-      font-size: 10px;
-      color: #bbb;
-    }
-
-    .option-box {
-      background: #f5f5f5;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    .option-title {
-      font-size: 10px;
-      color: #888;
-      margin-bottom: 6px;
-    }
-
-    .option-btn {
-      width: 100%;
-      padding: 6px;
-      margin: 3px 0;
-      font-size: 10px;
-      background: #e0e0e0;
-      color: #777;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .order-btn {
-      width: 100%;
-      padding: 12px;
-      background: #ccc;
-      color: #fff;
-      font-size: 11px;
-      border: none;
-      border-radius: 6px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    /* [신체 제약] 손떨림 효과 애니메이션 */
+    /* 미세 손떨림 효과 (부드러운 진동) */
     @keyframes tremor {
-      0% { transform: translate(0, 0); }
-      25% { transform: translate(2px, -2px); }
-      50% { transform: translate(-2px, 1px); }
-      75% { transform: translate(1px, 2px); }
-      100% { transform: translate(-1px, -1px); }
+      0% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-0.5px, 0.4px) rotate(-0.05deg); }
+      40% { transform: translate(0.6px, -0.3px) rotate(0.08deg); }
+      60% { transform: translate(-0.4px, -0.5px) rotate(-0.03deg); }
+      80% { transform: translate(0.5px, 0.3px) rotate(0.05deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
     }
 
-    .hand-tremor .tremor-target {
-      animation: tremor 0.15s infinite;
+    .elderly-tremor {
+      animation: tremor 0.25s infinite ease-in-out;
     }
 
-    /* 완료 모달 */
-    .modal {
+    /* 긴급 붉은 깜빡임 효과 */
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; color: #dc2626; }
+      50% { opacity: 0.4; color: #991b1b; }
+    }
+    .urgent-blink {
+      animation: pulse-red 0.8s infinite;
+    }
+
+    /* 스크롤바 감추기 */
+    .no-scrollbar::-webkit-scrollbar {
       display: none;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
     }
-
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .modal-content h3 {
-      color: #2e7d32;
-      margin-bottom: 10px;
-    }
-
-    .modal-content p {
-      font-size: 12px;
-      color: #555;
-      line-height: 1.5;
-      margin-bottom: 15px;
-    }
-
-    .modal-content button {
-      padding: 8px 16px;
-      background: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 4px;
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
-<body>
+<body class="h-screen w-screen overflow-hidden flex flex-col bg-white text-slate-800">
 
-  <div class="control-panel">
-    <h2>노년층 신체 제약 모드 설정</h2>
-    <div class="toggle-group">
-      <button class="toggle-btn active" id="visionBtn" onclick="toggleVision()">시각 제약 ON</button>
-      <button class="toggle-btn active" id="tremorBtn" onclick="toggleTremor()">손떨림 ON</button>
+  <!-- 상단 헤더 & 컨트롤 바 (밝은 스타일) -->
+  <header class="bg-slate-100 border-b border-slate-200 px-4 py-2.5 flex justify-between items-center z-50 shrink-0 shadow-sm">
+    <div class="flex items-center space-x-3">
+      <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+        <i class="fa-solid fa-eye-low-vision"></i> 디지털 약자 체감 시뮬레이터
+      </span>
+      <h1 class="text-base font-bold tracking-tight text-slate-800 hidden sm:block">고령층 키오스크 장벽 체감 체험</h1>
+    </div>
+
+    <!-- 미션 가이드 & 컨트롤 -->
+  <div class="flex items-center space-x-2 sm:space-x-3">
+    <button onclick="showMissionModal()" class="text-xs bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg transition border border-slate-300 font-medium flex items-center gap-1 shadow-sm">
+      <i class="fa-solid fa-clipboard-list text-amber-500"></i>
+      <span>미션 다시보기</span>
+      <span id="missionCheckBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-0.5">0</span>
+    </button>
+    <button id="audioToggleBtn" onclick="toggleAudio()" class="text-xs bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg transition border border-slate-300 font-medium flex items-center gap-1 shadow-sm">
+      <i class="fa-solid fa-volume-high text-indigo-600" id="audioIcon"></i>
+      <span id="audioStatusText">소음 OFF</span>
+    </button>
+    <button onclick="resetExperience()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg transition border border-rose-200 font-semibold">
+      <i class="fa-solid fa-rotate-right"></i> 초기화
+    </button>
+  </div>
+  </header>
+
+  <!-- 실시간 심리 압박 정보 바 (밝고 뚜렷하게) -->
+  <div class="bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-xs text-amber-900 flex justify-between items-center z-40 shrink-0">
+    <div class="flex items-center space-x-4">
+      <span class="flex items-center gap-1 text-rose-700 font-bold urgent-blink">
+        <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+        <span>주문 처리 제한시간: <span id="timerDisplay" class="text-sm font-extrabold underline">300</span>초</span>
+      </span>
+      <span class="text-amber-800 font-medium">
+        <i class="fa-solid fa-users text-amber-600"></i>
+        뒤쪽 대기 고객: <strong id="waitingCount" class="text-rose-600 text-sm">3</strong>명 (계속 증가 중)
+      </span>
+    </div>
+    <div class="text-xs text-slate-500 hidden sm:block">
+      * 디지털 약자가 실제로 느끼는 시인성·반응지연·용어 장벽이 적용된 밝은 화면입니다.
     </div>
   </div>
 
-  <div class="phone-container">
-    <div id="phoneScreen" class="phone-screen aging-vision hand-tremor">
-      
-      <div class="mission-header">
-        [미션] <span>'디카페인 카페라떼'</span>를 찾아서<br>
-        <span>'두유 변경'</span> 옵션을 선택하여 주문하세요!
+  <!-- 메인 단일 키오스크 영역 (밝은 배경 & 밝은 키오스크 프레임) -->
+  <main class="flex-1 flex items-center justify-center p-2 sm:p-4 bg-slate-50 overflow-hidden relative">
+    <div class="w-full max-w-md h-full max-h-[780px] bg-white rounded-2xl border-4 border-slate-300 flex flex-col overflow-hidden relative shadow-xl">
+      <!-- 키오스크 타이틀 바 -->
+      <div class="bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-900 border-b border-indigo-100 flex justify-between items-center shrink-0">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-display text-indigo-600"></i> 고령층 체감 시야 (밝음/약한손떨림/작은글씨/지연)</span>
+        <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">체험 전용 UI</span>
       </div>
 
-      <div class="kiosk-app">
-        <div class="app-title">카페 무인 주문 시스템</div>
+      <!-- 키오스크 화면 프레임 (밝은 라이트 테마) -->
+      <div id="kioskContainer" class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col bg-white elderly-view elderly-tremor">
+        <!-- JS 렌더링 -->
+      </div>
+    </div>
+
+    <!-- 터치 반응 지연 레이어 (오른쪽 시야 클릭 시 느껴지던 딜레이) -->
+    <div id="delayOverlay" class="hidden absolute inset-0 bg-slate-900/20 z-50 pointer-events-auto cursor-wait flex items-center justify-center backdrop-blur-[2px]">
+      <div class="bg-white text-slate-800 border border-slate-300 px-5 py-3 rounded-xl text-xs shadow-2xl animate-pulse flex items-center gap-2.5 font-bold">
+        <i class="fa-solid fa-spinner fa-spin text-base text-indigo-600"></i>
+        <span>시스템 처리 지연 중... (반복 터치 금지)</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- 10초 후 사라지는 건망증 체험 미션 팝업 -->
+  <div id="missionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-amber-400 rounded-2xl max-w-lg w-full p-6 text-slate-800 shadow-2xl relative">
+      <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
+        <div>
+          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-200">기억력 체험 미션</span>
+          <h2 class="text-xl font-bold mt-1.5 text-slate-900">주문할 메뉴를 기억하세요!</h2>
+        </div>
+        <div class="text-right">
+          <span id="modalCountdown" class="text-3xl font-extrabold text-rose-600">10</span>
+          <p class="text-[10px] text-slate-400">초 뒤 사라짐</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 mb-4">
+        <p class="text-xs text-slate-600 font-medium">다음 조건에 정확히 맞춰 키오스크로 주문을 완료하세요:</p>
+        <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-amber-950 text-sm font-semibold space-y-1.5">
+          <p>1. <span class="text-slate-900 font-bold underline">아이스 아메리카노</span> 1잔 선택 (어려운 외래어명 표시 주의)</p>
+          <p>2. 옵션: <span class="text-amber-800 underline">에스프레소 Extra Shot 2회</span> 추가</p>
+          <p>3. 옵션: <span class="text-amber-800 underline">두유(Soy Milk)</span> 옵션 변경 & <span class="text-amber-800 underline">얼음 최소화</span></p>
+          <p>4. 쿠폰: <span class="text-amber-800 underline">디저트 콤보 할인 쿠폰</span> 적용</p>
+          <p>5. 수령: <span class="text-slate-900 font-bold underline">To-Go (포장 수령)</span> 선택</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-rose-800 bg-rose-50 p-3 rounded-lg border border-rose-200 flex items-start gap-2">
+        <i class="fa-solid fa-brain text-rose-600 mt-0.5"></i>
+        <span>어르신들이 겪는 순간 건망증과 시각 정보 손실을 체험하기 위해 10초 후 완전히 숨겨집니다.</span>
+      </p>
+
+      <button onclick="startSessionNow()" class="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-md">
+        지금 바로 시작하기
+      </button>
+    </div>
+  </div>
+
+  <!-- 체험 결과 / 리포트 팝업 -->
+  <div id="resultModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 text-slate-800 shadow-2xl space-y-5 my-8">
+      <div id="resultHeader" class="text-center space-y-1">
+        <!-- JS로 다이나믹 생성 -->
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">체험 및 조작 분석 리포트</h4>
         
-        <div class="menu-grid">
-          <div class="menu-item tremor-target" onclick="wrongSelect('아메리카노')">
-            <div class="title">아메리카노(HOT)</div>
-            <div class="price">3,000원</div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+            <span class="text-[10px] text-slate-500 block">총 소요 시간</span>
+            <span id="resTime" class="text-base font-extrabold text-amber-600">0초</span>
           </div>
-          <div class="menu-item tremor-target" onclick="wrongSelect('카페라떼')">
-            <div class="title">카페라떼(ICE)</div>
-            <div class="price">3,500원</div>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+            <span class="text-[10px] text-slate-500 block">주문/미션 재확인</span>
+            <span id="resCheckCount" class="text-base font-extrabold text-indigo-600">0회</span>
           </div>
-          <div class="menu-item tremor-target" onclick="selectRightMenu()">
-            <div class="title">디카페인 라떼</div>
-            <div class="price">4,000원</div>
-          </div>
-          <div class="menu-item tremor-target" onclick="wrongSelect('바닐라라떼')">
-            <div class="title">바닐라라떼(ICE)</div>
-            <div class="price">4,500원</div>
+          <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+            <span class="text-[10px] text-slate-500 block">잘못된 클릭/방황</span>
+            <span id="resMistakes" class="text-base font-extrabold text-rose-600">0회</span>
           </div>
         </div>
 
-        <div class="option-box" id="optionBox" style="opacity: 0.4; pointer-events: none;">
-          <div class="option-title">세부 커스텀 옵션 선택</div>
-          <button class="option-btn tremor-target" onclick="wrongOption('우유 유지를')">기본 우유 선택</button>
-          <button class="option-btn tremor-target" id="soyBtn" onclick="selectSoyOption()">두유로 변경 (+500원)</button>
-          <button class="option-btn tremor-target" onclick="wrongOption('저지방 우유를')">저지방 우유 변경</button>
+        <!-- 주문 세부 조건 세부 일치 결과 검증 -->
+        <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1.5">
+          <span class="text-[11px] font-bold text-slate-700 block border-b border-slate-100 pb-1">주문 조건 세부 검증 결과</span>
+          <div id="missionMatchDetails" class="text-xs space-y-1 font-medium">
+            <!-- JS 다이나믹 생성 -->
+          </div>
         </div>
 
-        <button class="order-btn tremor-target" id="payBtn" onclick="completeMission()" disabled>결제하기</button>
-      </div>
-
-      <div class="modal" id="successModal">
-        <div class="modal-content">
-          <h3>미션 성공!</h3>
-          <p>
-            흐릿한 화면과 흔들리는 손으로 원하는 메뉴와 옵션을 찾는 것이 얼마나 답답하셨나요?<br><br>
-            노년층은 매일 이러한 기술적·신체적 장벽을 겪고 있습니다.
-          </p>
-          <button onclick="resetMission()">다시 시도하기</button>
+        <div class="space-y-1">
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-600 font-medium">디지털 피로도 및 인지 부담 지수:</span>
+            <span id="stressLevelText" class="font-bold text-rose-600">높음</span>
+          </div>
+          <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+            <div id="stressBar" class="bg-gradient-to-r from-amber-500 to-rose-600 h-full w-[80%]"></div>
+          </div>
         </div>
       </div>
 
+      <!-- 공감 메시지 및 사회적 의의 -->
+      <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-xs space-y-2 text-indigo-950">
+        <h4 class="font-bold text-indigo-900 flex items-center gap-1.5 text-sm">
+          <i class="fa-solid fa-heart-pulse text-indigo-600"></i> 우리가 함께 생각해야 할 점
+        </h4>
+        <p class="leading-relaxed text-slate-700">
+          우리가 경험한 몇 분 간의 답답함과 혼란은 **고령층 및 디지털 약자가 매일 일상에서 느끼는 실제 무력감**입니다.
+        </p>
+        <ul class="list-disc list-inside space-y-1 text-slate-600 pl-1">
+          <li>복잡한 외래어 표기대신 <strong>쉬운 우리말 표기</strong></li>
+          <li>지나치게 작은 글씨 대신 <strong>고대비·큰 글씨 모드 제공</strong></li>
+          <li>타이머 압박 없는 <strong>충분한 조작 시간 보장</strong></li>
+        </ul>
+      </div>
+
+      <button onclick="resetExperience()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg">
+        다시 체험해보기
+      </button>
     </div>
   </div>
 
+
+  <!-- JavaScript Logic -->
   <script>
-    let isMenuSelected = false;
-    let isOptionSelected = false;
+    // --- APP STATE ---
+    const state = {
+      step: 'MENU',
+      selectedCategory: 'BEVERAGE',
+      selectedItem: null,
+      customizations: {
+        shots: 0,
+        milk: 'REGULAR',
+        ice: 'NORMAL'
+      },
+      cart: [],
+      appliedCoupon: false,
+      takeoutType: null,
+      
+      // 통계 & 추적 데이터
+      timeLeft: 300,
+      waitingCount: 3,
+      mistakes: 0,
+      checkMissionCount: 0, // 미션/주문 재확인 횟수
+      startTime: null,
+      timerInterval: null,
+      audioActive: false,
+      audioCtx: null,
+      noiseNode: null
+    };
 
-    // 시각 제약 토글
-    function toggleVision() {
-      const screen = document.getElementById('phoneScreen');
-      const btn = document.getElementById('visionBtn');
-      screen.classList.toggle('aging-vision');
-      btn.classList.toggle('active');
-      btn.innerText = screen.classList.contains('aging-vision') ? '시각 제약 ON' : '시각 제약 OFF';
+    // 난해한 외래어 카테고리 & 메뉴 데이터
+    const menuData = {
+      BEVERAGE: [
+        { id: 'm1', name: 'Espresso d\'Illusion Water', desc: '아이스 아메리카노 (기본형)', price: 4500, target: true },
+        { id: 'm2', name: 'Velvet Lactose Latte System', desc: '카페 라떼', price: 5000, target: false },
+        { id: 'm3', name: 'Versailles Caramel Extract Dark Brew', desc: '카라멜 마키아토', price: 5800, target: false }
+      ],
+      DESERT: [
+        { id: 'd1', name: 'Glucose Layered Pastry Portion', desc: '조각 케이크', price: 6500, target: false },
+        { id: 'd2', name: 'Artisan Dough Bakery Unit', desc: '크루아상', price: 3800, target: false }
+      ],
+      SPECIAL_PROMO: [
+        { id: 'p1', name: 'Seasonal Synergy Package Option', desc: '시즌 세트', price: 9900, target: false }
+      ]
+    };
+
+    // --- INITIALIZATION & TIMER ---
+    let missionCountdown = 10;
+    let missionInterval = null;
+
+    // 터치 반응 지연 시뮬레이션 함수 (handleAction 추가)
+    function handleAction(callback) {
+      const overlay = document.getElementById('delayOverlay');
+      if (overlay) overlay.classList.remove('hidden');
+      
+      // 0.6초 지연 후 동작 실행 (어르신의 터치 지연/반응 속도 체험)
+      setTimeout(() => {
+        if (overlay) overlay.classList.add('hidden');
+        if (typeof callback === 'function') {
+          callback();
+        }
+        renderKiosk();
+      }, 600);
     }
 
-    // 손떨림 제약 토글
-    function toggleTremor() {
-      const screen = document.getElementById('phoneScreen');
-      const btn = document.getElementById('tremorBtn');
-      screen.classList.toggle('hand-tremor');
-      btn.classList.toggle('active');
-      btn.innerText = screen.classList.contains('hand-tremor') ? '손떨림 ON' : '손떨림 OFF';
+    // 카테고리 선택
+    function selectCategory(cat) {
+      state.selectedCategory = cat;
     }
 
-    // 메뉴 선택 로직
-    function selectRightMenu() {
-      isMenuSelected = true;
-      const optionBox = document.getElementById('optionBox');
-      optionBox.style.opacity = '1';
-      optionBox.style.pointerEvents = 'auto';
-      alert("디카페인 라떼가 선택되었습니다. 옵션을 선택하세요.");
+    // 옵션 설정 창 열기
+    function openCustomize(item) {
+      state.selectedItem = item;
+      state.customizations = { shots: 0, milk: 'REGULAR', ice: 'NORMAL' };
+      state.step = 'CUSTOMIZE';
     }
 
-    function wrongSelect(menuName) {
-      alert("잘못 선택하셨습니다. '" + menuName + "' 대신 '디카페인 라떼'를 찾아보세요.");
+    // 샷 수량 변경
+    function changeShot(delta) {
+      state.customizations.shots = Math.max(0, state.customizations.shots + delta);
     }
 
-    // 옵션 선택 로직
-    function selectSoyOption() {
-      if(!isMenuSelected) return;
-      isOptionSelected = true;
-      const soyBtn = document.getElementById('soyBtn');
-      const payBtn = document.getElementById('payBtn');
-      soyBtn.style.background = '#4CAF50';
-      soyBtn.style.color = '#fff';
-      payBtn.style.background = '#2196F3';
-      payBtn.disabled = false;
-      alert("두유 변경 옵션이 선택되었습니다. 하단의 결제하기 버튼을 누르세요.");
+    // 우유 옵션 변경
+    function setMilk(milkType) {
+      state.customizations.milk = milkType;
     }
 
-    function wrongOption(optName) {
-      alert("잘못 선택하셨습니다. " + optName + " 아닌 '두유로 변경'을 선택해야 합니다.");
+    // 얼음 옵션 변경
+    function setIce(iceType) {
+      state.customizations.ice = iceType;
     }
 
-    // 미션 완료
-    function completeMission() {
-      if(isMenuSelected && isOptionSelected) {
-        document.getElementById('successModal').style.display = 'flex';
+    // 장바구니에 담기
+    function addToCart() {
+      if (state.selectedItem) {
+        state.cart = [{ item: state.selectedItem, custom: { ...state.customizations } }];
+        state.step = 'CART';
       }
     }
 
-    // 리셋
-    function resetMission() {
-      isMenuSelected = false;
-      isOptionSelected = false;
-      document.getElementById('successModal').style.display = 'none';
-      document.getElementById('optionBox').style.opacity = '0.4';
-      document.getElementById('optionBox').style.pointerEvents = 'none';
+    // 쿠폰 적용 토글
+    function toggleCoupon() {
+      state.appliedCoupon = !state.appliedCoupon;
+    }
+
+    // 수령 방식 설정
+    function setTakeout(type) {
+      state.takeoutType = type;
+    }
+
+    // 결제 단계 이동 및 최종 주문 처리
+    function proceedToPayment() {
+      if (state.step === 'CART') {
+        state.step = 'PAYMENT';
+      } else if (state.step === 'MENU') {
+        if (state.cart.length > 0) {
+          state.step = 'CART';
+        } else {
+          state.mistakes++;
+        }
+      }
+    }
+
+    function finalizeOrder() {
+      finishExperience(false);
+    }
+
+    // 소음 토글 기능
+    function toggleAudio() {
+      state.audioActive = !state.audioActive;
+      const btnText = document.getElementById('audioStatusText');
+      const btnIcon = document.getElementById('audioIcon');
       
-      const soyBtn = document.getElementById('soyBtn');
-      const payBtn = document.getElementById('payBtn');
-      soyBtn.style.background = '#e0e0e0';
-      soyBtn.style.color = '#777';
-      payBtn.style.background = '#ccc';
-      payBtn.disabled = true;
+      if (state.audioActive) {
+        if (btnText) btnText.innerText = "소음 ON";
+        if (btnIcon) btnIcon.className = "fa-solid fa-volume-high text-rose-600";
+      } else {
+        if (btnText) btnText.innerText = "소음 OFF";
+        if (btnIcon) btnIcon.className = "fa-solid fa-volume-xmark text-slate-400";
+      }
+    }
+
+    window.onload = () => {
+      startMissionTimer();
+      renderKiosk();
+    };
+
+    function startMissionTimer() {
+      const cdEl = document.getElementById('modalCountdown');
+      missionInterval = setInterval(() => {
+        missionCountdown--;
+        if (cdEl) cdEl.innerText = missionCountdown;
+        if (missionCountdown <= 0) {
+          clearInterval(missionInterval);
+          startSessionNow();
+        }
+      }, 1000);
+    }
+
+    function startSessionNow() {
+      clearInterval(missionInterval);
+      document.getElementById('missionModal').classList.add('hidden');
+      state.startTime = Date.now();
+      
+      // 300초 메인 타이머 시작
+      if (!state.timerInterval) {
+        state.timerInterval = setInterval(() => {
+          state.timeLeft--;
+          document.getElementById('timerDisplay').innerText = state.timeLeft;
+          
+          // 대기 인원 증가 심리 압박 (30초마다 1명씩 증가)
+          if (state.timeLeft % 30 === 0) {
+            state.waitingCount++;
+            document.getElementById('waitingCount').innerText = state.waitingCount;
+          }
+
+          if (state.timeLeft <= 0) {
+            clearInterval(state.timerInterval);
+            finishExperience(false); // 시간 초과 실패
+          }
+        }, 1000);
+      }
+    }
+
+    function showMissionModal() {
+      state.checkMissionCount++;
+      const badge = document.getElementById('missionCheckBadge');
+      if (badge) badge.innerText = state.checkMissionCount;
+      document.getElementById('missionModal').classList.remove('hidden');
+    }
+
+    // --- AUDIOWAVE BACKGROUND NOISE (시끄러운 카페 주변 소음 가상 생성) ---
+    function finishExperience(isTimeoutFail = false) {
+      clearInterval(state.timerInterval);
+      const totalTime = Math.round((Date.now() - state.startTime) / 1000);
+
+      // 세부 주문 조건 검증
+      const cartItem = state.cart.length > 0 ? state.cart[0] : null;
+      const checks = {
+        itemMatch: cartItem && cartItem.item.id === 'm1',
+        shotMatch: cartItem && cartItem.custom.shots === 2,
+        milkMatch: cartItem && cartItem.custom.milk === 'SOY_SYNERGY',
+        iceMatch: cartItem && cartItem.custom.ice === 'ICE_MINIMIZE',
+        couponMatch: state.appliedCoupon === true,
+        togoMatch: state.takeoutType === 'TOGO'
+      };
+
+      const isAllMatched = Object.values(checks).every(Boolean);
+
+      const resModal = document.getElementById('resultModal');
+      const header = document.getElementById('resultHeader');
+
+      if (!isTimeoutFail && isAllMatched) {
+        header.innerHTML = `
+          <div class="text-emerald-500 text-4xl mb-1"><i class="fa-solid fa-circle-check"></i></div>
+          <h3 class="text-xl font-extrabold text-slate-900">주문 미션 완벽 성공!</h3>
+          <p class="text-xs text-slate-500">모든 복잡한 옵션 조건을 정확하게 확인하여 주문했습니다.</p>
+        `;
+      } else {
+        header.innerHTML = `
+          <div class="text-rose-500 text-4xl mb-1"><i class="fa-solid fa-circle-xmark"></i></div>
+          <h3 class="text-xl font-extrabold text-slate-900">${isTimeoutFail ? '시간 초과로 주문 실패' : '주문 세부 조건 불일치'}</h3>
+          <p class="text-xs text-slate-500">어르신들이 복잡한 메뉴와 옵션 선택에서 겪는 어려움을 체험하셨습니다.</p>
+        `;
+      }
+
+      // 통계 값 바인딩
+      document.getElementById('resTime').innerText = totalTime + "초";
+      document.getElementById('resCheckCount').innerText = state.checkMissionCount + "회";
+      document.getElementById('resMistakes').innerText = state.mistakes + "회";
+
+      // 주문 세부 결과 브레이크다운 생성
+      const detailsContainer = document.getElementById('missionMatchDetails');
+      detailsContainer.innerHTML = `
+        <div class="flex justify-between items-center ${checks.itemMatch ? 'text-emerald-700' : 'text-rose-600'}">
+          <span>1. 메뉴 (아이스 아메리카노):</span>
+          <span class="font-bold">${checks.itemMatch ? '✓ 일치' : '✗ 불일치'}</span>
+        </div>
+        <div class="flex justify-between items-center ${checks.shotMatch ? 'text-emerald-700' : 'text-rose-600'}">
+          <span>2. 옵션 (샷 2회 추가):</span>
+          <span class="font-bold">${checks.shotMatch ? '✓ 일치' : '✗ 불일치'}</span>
+        </div>
+        <div class="flex justify-between items-center ${checks.milkMatch ? 'text-emerald-700' : 'text-rose-600'}">
+          <span>3. 옵션 (두유 / Soy Milk):</span>
+          <span class="font-bold">${checks.milkMatch ? '✓ 일치' : '✗ 불일치'}</span>
+        </div>
+        <div class="flex justify-between items-center ${checks.iceMatch ? 'text-emerald-700' : 'text-rose-600'}">
+          <span>4. 옵션 (얼음 최소화):</span>
+          <span class="font-bold">${checks.iceMatch ? '✓ 일치' : '✗ 불일치'}</span>
+        </div>
+        <div class="flex justify-between items-center ${checks.couponMatch ? 'text-emerald-700' : 'text-rose-600'}">
+          <span>5. 쿠폰 (디저트 콤보 할인):</span>
+          <span class="font-bold">${checks.couponMatch ? '✓ 일치' : '✗ 불일치'}</span>
+        </div>
+        <div class="flex justify-between items-center ${checks.togoMatch ? 'text-emerald-700' : 'text-rose-600'}">
+          <span>6. 수령 방식 (To-Go 포장):</span>
+          <span class="font-bold">${checks.togoMatch ? '✓ 일치' : '✗ 불일치'}</span>
+        </div>
+      `;
+
+      resModal.classList.remove('hidden');
+    }
+
+    function resetExperience() {
+      location.reload();
+    }
+
+    // --- RENDER KIOSK SINGLE VIEW (BRIGHT LIGHT THEME) ---
+    function renderKiosk() {
+      document.getElementById('kioskContainer').innerHTML = buildKioskHTML();
+    }
+
+    function buildKioskHTML() {
+      const clickHandler = (fnStr) => `onclick="handleAction(() => { ${fnStr} })"`;
+
+      // 1. 카테고리/메뉴 선택 화면
+      if (state.step === 'MENU') {
+        const items = menuData[state.selectedCategory] || [];
+        return `
+          <div class="flex flex-col h-full bg-white text-slate-800">
+            <!-- 밝은 상단 브랜드 헤더 -->
+            <div class="bg-indigo-600 p-3 text-center text-white">
+              <span class="text-[9px] tracking-widest text-indigo-200 uppercase font-bold">POS DIRECT ORDER SYSTEM v4.2</span>
+              <h2 class="text-xs font-extrabold text-white mt-0.5">BEVERAGE & DESERT SYNERGY STORE</h2>
+            </div>
+
+            <!-- 불친절한 복잡 서브 카테고리 (밝은 라이트 스타일) -->
+            <div class="flex bg-slate-100 border-b border-slate-200 text-[11px]">
+              <button ${clickHandler("selectCategory('BEVERAGE')")} class="flex-1 py-2.5 px-1 font-bold border-b-2 text-center transition ${state.selectedCategory === 'BEVERAGE' ? 'border-amber-500 text-amber-700 bg-white' : 'border-transparent text-slate-500'}">
+                COFFEE & INFUSION
+              </button>
+              <button ${clickHandler("selectCategory('DESERT')")} class="flex-1 py-2.5 px-1 font-bold border-b-2 text-center transition ${state.selectedCategory === 'DESERT' ? 'border-amber-500 text-amber-700 bg-white' : 'border-transparent text-slate-500'}">
+                BAKERY DESSERT
+              </button>
+              <button ${clickHandler("selectCategory('SPECIAL_PROMO')")} class="flex-1 py-2.5 px-1 font-bold border-b-2 text-center transition ${state.selectedCategory === 'SPECIAL_PROMO' ? 'border-amber-500 text-amber-700 bg-white' : 'border-transparent text-slate-500'}">
+                PACKAGE PROMO
+              </button>
+            </div>
+
+            <!-- 메뉴 리스트 (밝고 선명하게) -->
+            <div class="flex-1 p-3 space-y-2.5 overflow-y-auto bg-slate-50/50">
+              <div class="text-[10px] text-slate-400 font-semibold mb-1">SELECT ITEM CODE FOR CUSTOMIZATION:</div>
+              ${items.map(item => `
+                <div ${clickHandler(`openCustomize(${JSON.stringify(item).replace(/"/g, '&quot;')})`)} 
+                     class="bg-white hover:bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center cursor-pointer active:scale-98 transition shadow-sm">
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">${item.name}</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5 font-medium">${item.desc}</div>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-extrabold text-amber-600">₩${item.price.toLocaleString()}</span>
+                    <span class="block text-[9px] text-indigo-600 font-mono font-bold">SELECT ></span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- 장바구니 요약 하단 바 (밝은 스타일) -->
+            <div class="bg-white p-3 border-t border-slate-200 flex justify-between items-center shadow-lg">
+              <div>
+                <span class="text-[10px] text-slate-400 font-semibold block">CURRENT ORDER UNITS</span>
+                <span class="text-xs font-extrabold text-indigo-700">${state.cart.length} ITEMS IN CART</span>
+              </div>
+              <button ${clickHandler("proceedToPayment()")} class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2.5 rounded-xl font-extrabold text-xs shadow-md transition">
+                ORDER PROCESS CHECKOUT
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. 옵션 커스텀 화면 (밝은 테마)
+      if (state.step === 'CUSTOMIZE') {
+        const item = state.selectedItem;
+        return `
+          <div class="flex flex-col h-full bg-white text-slate-800 p-3">
+            <div class="border-b border-slate-200 pb-2 mb-3">
+              <span class="text-[9px] text-amber-600 font-bold uppercase">CUSTOMIZE SYNERGY MODIFIER</span>
+              <h3 class="text-sm font-bold text-slate-900">${item.name}</h3>
+            </div>
+
+            <div class="flex-1 space-y-3.5 overflow-y-auto text-xs">
+              <!-- 에스프레소 샷 추가 -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5 shadow-sm">
+                <div class="flex justify-between items-center">
+                  <span class="font-bold text-slate-800">EXTRA ESPRESSO CONCENTRATE</span>
+                  <span class="text-[10px] text-amber-600 font-mono font-bold">+ ₩500 / Shot</span>
+                </div>
+                <div class="flex items-center space-x-3 mt-1">
+                  <button ${clickHandler("changeShot(-1)")} class="w-8 h-8 bg-white rounded-lg text-slate-800 font-bold text-base flex items-center justify-center border border-slate-300 shadow-sm">-</button>
+                  <span class="font-extrabold text-amber-600 text-sm px-2">${state.customizations.shots} SHOTS</span>
+                  <button ${clickHandler("changeShot(1)")} class="w-8 h-8 bg-white rounded-lg text-slate-800 font-bold text-base flex items-center justify-center border border-slate-300 shadow-sm">+</button>
+                </div>
+              </div>
+
+              <!-- 유제품 옵션 -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+                <span class="font-bold text-slate-800 block">LACTOSE / BASE ALTERNATIVE</span>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <button ${clickHandler("setMilk('REGULAR')")} class="py-2 px-2 rounded-lg border text-center font-bold transition ${state.customizations.milk === 'REGULAR' ? 'bg-amber-500 text-white border-amber-500 shadow' : 'bg-white border-slate-300 text-slate-600'}">
+                    ORIGINAL DAIRY
+                  </button>
+                  <button ${clickHandler("setMilk('SOY_SYNERGY')")} class="py-2 px-2 rounded-lg border text-center font-bold transition ${state.customizations.milk === 'SOY_SYNERGY' ? 'bg-amber-500 text-white border-amber-500 shadow' : 'bg-white border-slate-300 text-slate-600'}">
+                    SOY BEAN EXTRACT
+                  </button>
+                </div>
+              </div>
+
+              <!-- 얼음 옵션 -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+                <span class="font-bold text-slate-800 block">SOLID H2O RATIO CONTROL</span>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <button ${clickHandler("setIce('NORMAL')")} class="py-2 px-2 rounded-lg border text-center font-bold transition ${state.customizations.ice === 'NORMAL' ? 'bg-amber-500 text-white border-amber-500 shadow' : 'bg-white border-slate-300 text-slate-600'}">
+                    STANDARD ICE
+                  </button>
+                  <button ${clickHandler("setIce('ICE_MINIMIZE')")} class="py-2 px-2 rounded-lg border text-center font-bold transition ${state.customizations.ice === 'ICE_MINIMIZE' ? 'bg-amber-500 text-white border-amber-500 shadow' : 'bg-white border-slate-300 text-slate-600'}">
+                    MINIMIZE ICE UNITS
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 하단 확인 / 취소 -->
+            <div class="pt-3 border-t border-slate-200 flex gap-2">
+              <button ${clickHandler("state.step='MENU'")} class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">
+                PREVIOUS STEP
+              </button>
+              <button ${clickHandler("addToCart()")} class="w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-extrabold shadow-md transition">
+                CONFIRM SELECTION
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // 3. 장바구니 및 수령 방식/쿠폰 적용 화면 (밝은 테마)
+      if (state.step === 'CART') {
+        const totalAmount = state.cart.reduce((sum, c) => sum + c.item.price + (c.custom.shots * 500), 0);
+        const finalPrice = state.appliedCoupon ? Math.max(0, totalAmount - 2000) : totalAmount;
+
+        return `
+          <div class="flex flex-col h-full bg-white text-slate-800 p-3">
+            <div class="border-b border-slate-200 pb-2 mb-2">
+              <h3 class="text-sm font-bold text-slate-900">CHECKOUT MATRIX & AUTHORIZATION</h3>
+              <p class="text-[10px] text-slate-500">주문 내역과 인증 쿠폰을 조합하세요.</p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-3">
+              <!-- 장바구니 리스트 -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+                <span class="text-[10px] text-slate-500 font-bold uppercase">SELECTED BEVERAGE UNITS</span>
+                ${state.cart.map(c => `
+                  <div class="flex justify-between items-start text-xs border-b border-slate-200 pb-2">
+                    <div>
+                      <div class="font-bold text-slate-900">${c.item.name}</div>
+                      <div class="text-[10px] text-amber-700 font-medium">
+                        Extra Shots: +${c.custom.shots} | Base: ${c.custom.milk} | Ice: ${c.custom.ice}
+                      </div>
+                    </div>
+                    <span class="font-bold text-slate-900">₩${(c.item.price + c.custom.shots*500).toLocaleString()}</span>
+                  </div>
+                `).join('')}
+              </div>
+
+              <!-- 쿠폰 적용 버튼 -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5 shadow-sm">
+                <span class="text-[10px] text-slate-500 font-bold block">DISCOUNT AUTHORIZATION CODE</span>
+                <button ${clickHandler("toggleCoupon()")} class="w-full py-2.5 px-3 rounded-lg border text-xs font-bold transition flex justify-between items-center ${state.appliedCoupon ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white border-slate-300 text-slate-700'}">
+                  <span>DESSERT COMBO AUTHORIZATION (-₩2,000)</span>
+                  <i class="fa-solid ${state.appliedCoupon ? 'fa-check text-white' : 'fa-plus text-slate-400'}"></i>
+                </button>
+              </div>
+
+              <!-- 수령 방식 선택 -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5 shadow-sm">
+                <span class="text-[10px] text-slate-500 font-bold block">RECEIPT TYPE MODALITY</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <button ${clickHandler("setTakeout('STORE')")} class="py-2.5 rounded-lg border font-bold transition ${state.takeoutType === 'STORE' ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-white border-slate-300 text-slate-700'}">
+                    IN-STORE CONSUME
+                  </button>
+                  <button ${clickHandler("setTakeout('TOGO')")} class="py-2.5 rounded-lg border font-bold transition ${state.takeoutType === 'TOGO' ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-white border-slate-300 text-slate-700'}">
+                    TO-GO PACKAGING
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 결제 금액 및 최종 진행 -->
+            <div class="pt-3 border-t border-slate-200 space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-600 font-bold">FINAL TRANSACTION AMOUNT:</span>
+                <span class="text-base font-extrabold text-amber-600">₩${finalPrice.toLocaleString()}</span>
+              </div>
+              <button ${clickHandler("proceedToPayment()")} class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 py-3 rounded-xl font-extrabold text-xs shadow-md transition">
+                PROCEED TO TERMINAL TRANSACTION
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // 4. 결제 진행 단계 (밝은 라이트 테마)
+      if (state.step === 'PAYMENT') {
+        return `
+          <div class="flex flex-col h-full bg-white text-slate-800 p-4 text-center justify-between">
+            <div class="space-y-3 my-auto">
+              <div class="text-indigo-600 text-4xl animate-pulse"><i class="fa-solid fa-credit-card"></i></div>
+              <h3 class="text-sm font-bold text-slate-900">POS IC-CARD CONTACT TERMINAL</h3>
+              <p class="text-[11px] text-slate-500 max-w-xs mx-auto">
+                Insert IC Chip Card into the designated authorization slot at the bottom right corner.
+              </p>
+              <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-[10px] text-amber-900 text-left space-y-1">
+                <div>* Do not extract card during Transaction Authorization process.</div>
+                <div>* IC칩 결제 모듈 승인 지연 시 반환 버튼을 누르지 마십시오.</div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <button ${clickHandler("finalizeOrder()")} class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-extrabold text-xs shadow-md transition">
+                COMPLETE TRANSACTION DIRECT AUTHORIZE
+              </button>
+              <button ${clickHandler("state.step='MENU'")} class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 rounded-xl text-[10px] font-bold transition">
+                RETURN TO INITIAL PROCESS
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      return '';
     }
   </script>
 </body>
