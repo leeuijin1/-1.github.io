@@ -19,8 +19,8 @@
 
     /* 고령층 시야 특수 효과 - 약한 Blur & 작은 글씨 (밝은 화면 고정) */
     .elderly-view {
-      filter: blur(1.0px) contrast(98%) brightness(102%);
-      font-size: 0.75rem !important; /* 작은 글씨 */
+      filter: blur(0.8px) contrast(98%) brightness(102%);
+      font-size: 0.72rem !important; /* 모바일 맞춤 글씨 */
       transform-origin: center center;
     }
 
@@ -57,171 +57,168 @@
     }
   </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col bg-white text-slate-800">
+<body class="h-[100dvh] w-screen overflow-hidden flex flex-col bg-white text-slate-800">
 
-  <!-- 상단 헤더 & 컨트롤 바 (밝은 스타일) -->
-  <header class="bg-slate-100 border-b border-slate-200 px-4 py-2.5 flex justify-between items-center z-50 shrink-0 shadow-sm">
-    <div class="flex items-center space-x-3">
-      <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-        <i class="fa-solid fa-eye-low-vision"></i> 디지털 약자 체감 시뮬레이터
+  <!-- 상단 헤더 & 컨트롤 바 (모바일 세로형 가독성 최적화) -->
+  <header class="bg-slate-100 border-b border-slate-200 px-2 sm:px-4 py-2 flex justify-between items-center z-50 shrink-0 shadow-sm">
+    <div class="flex items-center space-x-1.5">
+      <span class="bg-indigo-600 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full flex items-center gap-1 shrink-0">
+        <i class="fa-solid fa-eye-low-vision"></i> 약자 시뮬레이터
       </span>
-      <h1 class="text-base font-bold tracking-tight text-slate-800 hidden sm:block">고령층 키오스크 장벽 체감 체험</h1>
+      <h1 class="text-xs sm:text-base font-bold tracking-tight text-slate-800 truncate hidden xs:block">고령층 키오스크 체감</h1>
     </div>
 
     <!-- 미션 가이드 & 컨트롤 -->
-  <div class="flex items-center space-x-2 sm:space-x-3">
-    <button onclick="showMissionModal()" class="text-xs bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg transition border border-slate-300 font-medium flex items-center gap-1 shadow-sm">
-      <i class="fa-solid fa-clipboard-list text-amber-500"></i>
-      <span>미션 다시보기</span>
-      <span id="missionCheckBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-0.5">0</span>
-    </button>
-    <button id="audioToggleBtn" onclick="toggleAudio()" class="text-xs bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg transition border border-slate-300 font-medium flex items-center gap-1 shadow-sm">
-      <i class="fa-solid fa-volume-high text-indigo-600" id="audioIcon"></i>
-      <span id="audioStatusText">소음 OFF</span>
-    </button>
-    <button onclick="resetExperience()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg transition border border-rose-200 font-semibold">
-      <i class="fa-solid fa-rotate-right"></i> 초기화
-    </button>
-  </div>
+    <div class="flex items-center space-x-1.5 sm:space-x-2">
+      <button onclick="showMissionModal()" class="text-[11px] sm:text-xs bg-white hover:bg-slate-50 text-slate-700 px-2 py-1 rounded-lg transition border border-slate-300 font-medium flex items-center gap-1 shadow-sm">
+        <i class="fa-solid fa-clipboard-list text-amber-500"></i>
+        <span>미션</span>
+        <span id="missionCheckBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.2 rounded-full">0</span>
+      </button>
+      <button id="audioToggleBtn" onclick="toggleAudio()" class="text-[11px] sm:text-xs bg-white hover:bg-slate-50 text-slate-700 px-2 py-1 rounded-lg transition border border-slate-300 font-medium flex items-center gap-1 shadow-sm">
+        <i class="fa-solid fa-volume-high text-indigo-600" id="audioIcon"></i>
+        <span id="audioStatusText" class="hidden sm:inline">소음 OFF</span>
+      </button>
+      <button onclick="resetExperience()" class="text-[11px] sm:text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-2 py-1 rounded-lg transition border border-rose-200 font-semibold">
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+    </div>
   </header>
 
-  <!-- 실시간 심리 압박 정보 바 (밝고 뚜렷하게) -->
-  <div class="bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-xs text-amber-900 flex justify-between items-center z-40 shrink-0">
-    <div class="flex items-center space-x-4">
+  <!-- 실시간 심리 압박 정보 바 (모바일 핏) -->
+  <div class="bg-amber-50 border-b border-amber-200 px-2.5 py-1 text-[11px] sm:text-xs text-amber-900 flex justify-between items-center z-40 shrink-0">
+    <div class="flex items-center justify-between w-full sm:w-auto sm:justify-start sm:space-x-4">
       <span class="flex items-center gap-1 text-rose-700 font-bold urgent-blink">
         <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
-        <span>주문 처리 제한시간: <span id="timerDisplay" class="text-sm font-extrabold underline">300</span>초</span>
+        <span>제한시간: <span id="timerDisplay" class="text-xs sm:text-sm font-extrabold underline">300</span>초</span>
       </span>
       <span class="text-amber-800 font-medium">
         <i class="fa-solid fa-users text-amber-600"></i>
-        뒤쪽 대기 고객: <strong id="waitingCount" class="text-rose-600 text-sm">3</strong>명 (계속 증가 중)
+        대기: <strong id="waitingCount" class="text-rose-600 text-xs sm:text-sm">3</strong>명
       </span>
-    </div>
-    <div class="text-xs text-slate-500 hidden sm:block">
-      * 디지털 약자가 실제로 느끼는 시인성·반응지연·용어 장벽이 적용된 밝은 화면입니다.
     </div>
   </div>
 
-  <!-- 메인 단일 키오스크 영역 (밝은 배경 & 밝은 키오스크 프레임) -->
-  <main class="flex-1 flex items-center justify-center p-2 sm:p-4 bg-slate-50 overflow-hidden relative">
-    <div class="w-full max-w-md h-full max-h-[780px] bg-white rounded-2xl border-4 border-slate-300 flex flex-col overflow-hidden relative shadow-xl">
+  <!-- 메인 단일 키오스크 영역 (모바일 디바이스 맞춤 flex-1) -->
+  <main class="flex-1 flex items-center justify-center p-1.5 sm:p-4 bg-slate-50 overflow-hidden relative">
+    <div class="w-full max-w-sm sm:max-w-md h-full bg-white rounded-xl sm:rounded-2xl border-2 sm:border-4 border-slate-300 flex flex-col overflow-hidden relative shadow-lg">
       <!-- 키오스크 타이틀 바 -->
-      <div class="bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-900 border-b border-indigo-100 flex justify-between items-center shrink-0">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-display text-indigo-600"></i> 고령층 체감 시야 (밝음/약한손떨림/작은글씨/지연)</span>
-        <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">체험 전용 UI</span>
+      <div class="bg-indigo-50 px-2.5 py-1.5 text-[10px] sm:text-xs font-bold text-indigo-900 border-b border-indigo-100 flex justify-between items-center shrink-0">
+        <span class="flex items-center gap-1 truncate"><i class="fa-solid fa-display text-indigo-600"></i> 고령층 체감 시야</span>
+        <span class="text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-semibold shrink-0">체험 전용</span>
       </div>
 
-      <!-- 키오스크 화면 프레임 (밝은 라이트 테마) -->
+      <!-- 키오스크 화면 프레임 (모바일 스크롤 가능) -->
       <div id="kioskContainer" class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col bg-white elderly-view elderly-tremor">
         <!-- JS 렌더링 -->
       </div>
     </div>
 
-    <!-- 터치 반응 지연 레이어 (오른쪽 시야 클릭 시 느껴지던 딜레이) -->
+    <!-- 터치 반응 지연 레이어 -->
     <div id="delayOverlay" class="hidden absolute inset-0 bg-slate-900/20 z-50 pointer-events-auto cursor-wait flex items-center justify-center backdrop-blur-[2px]">
-      <div class="bg-white text-slate-800 border border-slate-300 px-5 py-3 rounded-xl text-xs shadow-2xl animate-pulse flex items-center gap-2.5 font-bold">
-        <i class="fa-solid fa-spinner fa-spin text-base text-indigo-600"></i>
-        <span>시스템 처리 지연 중... (반복 터치 금지)</span>
+      <div class="bg-white text-slate-800 border border-slate-300 px-4 py-2.5 rounded-xl text-xs shadow-2xl animate-pulse flex items-center gap-2 font-bold">
+        <i class="fa-solid fa-spinner fa-spin text-sm text-indigo-600"></i>
+        <span>시스템 처리 지연 중...</span>
       </div>
     </div>
   </main>
 
   <!-- 10초 후 사라지는 건망증 체험 미션 팝업 -->
-  <div id="missionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white border-2 border-amber-400 rounded-2xl max-w-lg w-full p-6 text-slate-800 shadow-2xl relative">
-      <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
+  <div id="missionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3">
+    <div class="bg-white border-2 border-amber-400 rounded-xl max-w-md w-full p-4 sm:p-5 text-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-start mb-2.5 border-b border-slate-100 pb-2">
         <div>
-          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-200">기억력 체험 미션</span>
-          <h2 class="text-xl font-bold mt-1.5 text-slate-900">주문할 메뉴를 기억하세요!</h2>
+          <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">기억력 체험 미션</span>
+          <h2 class="text-base sm:text-lg font-bold mt-1 text-slate-900">주문할 메뉴를 기억하세요!</h2>
         </div>
-        <div class="text-right">
-          <span id="modalCountdown" class="text-3xl font-extrabold text-rose-600">10</span>
-          <p class="text-[10px] text-slate-400">초 뒤 사라짐</p>
+        <div class="text-right shrink-0">
+          <span id="modalCountdown" class="text-2xl font-extrabold text-rose-600">10</span>
+          <p class="text-[9px] text-slate-400">초 뒤 사라짐</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 mb-4">
-        <p class="text-xs text-slate-600 font-medium">다음 조건에 정확히 맞춰 키오스크로 주문을 완료하세요:</p>
-        <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-amber-950 text-sm font-semibold space-y-1.5">
-          <p>1. <span class="text-slate-900 font-bold underline">아이스 아메리카노</span> 1잔 선택 (어려운 외래어명 표시 주의)</p>
+      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1.5 mb-3">
+        <p class="text-[11px] text-slate-600 font-medium">다음 조건에 정확히 맞춰 주문하세요:</p>
+        <div class="bg-amber-50 p-2.5 rounded-md border border-amber-200 text-amber-950 text-xs font-semibold space-y-1">
+          <p>1. <span class="text-slate-900 font-bold underline">아이스 아메리카노</span> 1잔 선택</p>
           <p>2. 옵션: <span class="text-amber-800 underline">에스프레소 Extra Shot 2회</span> 추가</p>
-          <p>3. 옵션: <span class="text-amber-800 underline">두유(Soy Milk)</span> 옵션 변경 & <span class="text-amber-800 underline">얼음 최소화</span></p>
+          <p>3. 옵션: <span class="text-amber-800 underline">두유(Soy Milk)</span> 변경 & <span class="text-amber-800 underline">얼음 최소화</span></p>
           <p>4. 쿠폰: <span class="text-amber-800 underline">디저트 콤보 할인 쿠폰</span> 적용</p>
-          <p>5. 수령: <span class="text-slate-900 font-bold underline">To-Go (포장 수령)</span> 선택</p>
+          <p>5. 수령: <span class="text-slate-900 font-bold underline">To-Go (포장)</span> 선택</p>
         </div>
       </div>
 
-      <p class="text-xs text-rose-800 bg-rose-50 p-3 rounded-lg border border-rose-200 flex items-start gap-2">
-        <i class="fa-solid fa-brain text-rose-600 mt-0.5"></i>
-        <span>어르신들이 겪는 순간 건망증과 시각 정보 손실을 체험하기 위해 10초 후 완전히 숨겨집니다.</span>
+      <p class="text-[10px] text-rose-800 bg-rose-50 p-2.5 rounded-md border border-rose-200 flex items-start gap-1.5 leading-tight">
+        <i class="fa-solid fa-brain text-rose-600 mt-0.5 shrink-0"></i>
+        <span>어르신들이 겪는 순간 건망증 체험을 위해 10초 후 숨겨집니다.</span>
       </p>
 
-      <button onclick="startSessionNow()" class="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-md">
+      <button onclick="startSessionNow()" class="mt-3 w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg text-xs transition shadow-md">
         지금 바로 시작하기
       </button>
     </div>
   </div>
 
   <!-- 체험 결과 / 리포트 팝업 -->
-  <div id="resultModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 text-slate-800 shadow-2xl space-y-5 my-8">
-      <div id="resultHeader" class="text-center space-y-1">
+  <div id="resultModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white border border-slate-200 rounded-xl max-w-md w-full p-4 sm:p-5 text-slate-800 shadow-2xl space-y-3.5 my-auto max-h-[92vh] overflow-y-auto">
+      <div id="resultHeader" class="text-center space-y-0.5">
         <!-- JS로 다이나믹 생성 -->
       </div>
 
-      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">체험 및 조작 분석 리포트</h4>
+      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2.5">
+        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">체험 및 조작 분석 리포트</h4>
         
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
-            <span class="text-[10px] text-slate-500 block">총 소요 시간</span>
-            <span id="resTime" class="text-base font-extrabold text-amber-600">0초</span>
+        <div class="grid grid-cols-3 gap-1.5 text-center">
+          <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+            <span class="text-[9px] text-slate-500 block">소요 시간</span>
+            <span id="resTime" class="text-sm font-extrabold text-amber-600">0초</span>
           </div>
-          <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
-            <span class="text-[10px] text-slate-500 block">주문/미션 재확인</span>
-            <span id="resCheckCount" class="text-base font-extrabold text-indigo-600">0회</span>
+          <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+            <span class="text-[9px] text-slate-500 block">미션 재확인</span>
+            <span id="resCheckCount" class="text-sm font-extrabold text-indigo-600">0회</span>
           </div>
-          <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
-            <span class="text-[10px] text-slate-500 block">잘못된 클릭/방황</span>
-            <span id="resMistakes" class="text-base font-extrabold text-rose-600">0회</span>
+          <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+            <span class="text-[9px] text-slate-500 block">실수/방황</span>
+            <span id="resMistakes" class="text-sm font-extrabold text-rose-600">0회</span>
           </div>
         </div>
 
         <!-- 주문 세부 조건 세부 일치 결과 검증 -->
-        <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1.5">
-          <span class="text-[11px] font-bold text-slate-700 block border-b border-slate-100 pb-1">주문 조건 세부 검증 결과</span>
-          <div id="missionMatchDetails" class="text-xs space-y-1 font-medium">
+        <div class="bg-white p-2.5 rounded border border-slate-200 space-y-1">
+          <span class="text-[10px] font-bold text-slate-700 block border-b border-slate-100 pb-0.5">주문 세부 조건 검증</span>
+          <div id="missionMatchDetails" class="text-[11px] space-y-0.5 font-medium">
             <!-- JS 다이나믹 생성 -->
           </div>
         </div>
 
-        <div class="space-y-1">
-          <div class="flex justify-between text-xs">
-            <span class="text-slate-600 font-medium">디지털 피로도 및 인지 부담 지수:</span>
+        <div class="space-y-0.5">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-600 font-medium">인지 부담 지수:</span>
             <span id="stressLevelText" class="font-bold text-rose-600">높음</span>
           </div>
-          <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+          <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
             <div id="stressBar" class="bg-gradient-to-r from-amber-500 to-rose-600 h-full w-[80%]"></div>
           </div>
         </div>
       </div>
 
       <!-- 공감 메시지 및 사회적 의의 -->
-      <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-xs space-y-2 text-indigo-950">
-        <h4 class="font-bold text-indigo-900 flex items-center gap-1.5 text-sm">
-          <i class="fa-solid fa-heart-pulse text-indigo-600"></i> 우리가 함께 생각해야 할 점
+      <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-lg text-[11px] space-y-1 text-indigo-950">
+        <h4 class="font-bold text-indigo-900 flex items-center gap-1 text-xs">
+          <i class="fa-solid fa-heart-pulse text-indigo-600"></i> 함께 생각해요
         </h4>
-        <p class="leading-relaxed text-slate-700">
-          우리가 경험한 몇 분 간의 답답함과 혼란은 **고령층 및 디지털 약자가 매일 일상에서 느끼는 실제 무력감**입니다.
+        <p class="leading-snug text-slate-700">
+          이 답답함은 **고령층이 일상에서 느끼는 실제 무력감**입니다.
         </p>
-        <ul class="list-disc list-inside space-y-1 text-slate-600 pl-1">
-          <li>복잡한 외래어 표기대신 <strong>쉬운 우리말 표기</strong></li>
-          <li>지나치게 작은 글씨 대신 <strong>고대비·큰 글씨 모드 제공</strong></li>
-          <li>타이머 압박 없는 <strong>충분한 조작 시간 보장</strong></li>
+        <ul class="list-disc list-inside space-y-0.5 text-slate-600 pl-0.5 text-[10px]">
+          <li><strong>쉬운 우리말 표기</strong> 도입</li>
+          <li><strong>고대비·큰 글씨 모드</strong> 필수 제공</li>
+          <li>타이머 없는 <strong>충분한 조작 시간 보장</strong></li>
         </ul>
       </div>
 
-      <button onclick="resetExperience()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg">
+      <button onclick="resetExperience()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-md">
         다시 체험해보기
       </button>
     </div>
