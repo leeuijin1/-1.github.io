@@ -303,89 +303,10 @@
     let missionCountdown = 10;
     let missionInterval = null;
 
-    // 터치 반응 지연 시뮬레이션 함수
-    function handleAction(callback) {
-      const overlay = document.getElementById('delayOverlay');
-      if (overlay) overlay.classList.remove('hidden');
-      
-      setTimeout(() => {
-        if (overlay) overlay.classList.add('hidden');
-        if (typeof callback === 'function') {
-          callback();
-        }
-        renderKiosk();
-      }, 500);
-    }
-
-    function selectCategory(cat) {
-      state.selectedCategory = cat;
-    }
-
-    function openCustomize(item) {
-      state.selectedItem = item;
-      state.customizations = { shots: 0, milk: 'REGULAR', ice: 'NORMAL' };
-      state.step = 'CUSTOMIZE';
-    }
-
-    function changeShot(delta) {
-      state.customizations.shots = Math.max(0, state.customizations.shots + delta);
-    }
-
-    function setMilk(milkType) {
-      state.customizations.milk = milkType;
-    }
-
-    function setIce(iceType) {
-      state.customizations.ice = iceType;
-    }
-
-    function addToCart() {
-      if (state.selectedItem) {
-        state.cart = [{ item: state.selectedItem, custom: { ...state.customizations } }];
-        state.step = 'CART';
-      }
-    }
-
-    function toggleCoupon() {
-      state.appliedCoupon = !state.appliedCoupon;
-    }
-
-    function setTakeout(type) {
-      state.takeoutType = type;
-    }
-
-    function proceedToPayment() {
-      if (state.step === 'CART') {
-        state.step = 'PAYMENT';
-      } else if (state.step === 'MENU') {
-        if (state.cart.length > 0) {
-          state.step = 'CART';
-        } else {
-          state.mistakes++;
-        }
-      }
-    }
-
-    function finalizeOrder() {
-      finishExperience(false);
-    }
-
-    function toggleAudio() {
-      state.audioActive = !state.audioActive;
-      const btnText = document.getElementById('audioStatusText');
-      const btnIcon = document.getElementById('audioIcon');
-      
-      if (state.audioActive) {
-        if (btnText) btnText.innerText = "소음 ON";
-        if (btnIcon) btnIcon.className = "fa-solid fa-volume-high text-rose-600 text-[9px]";
-      } else {
-        if (btnText) btnText.innerText = "소음 OFF";
-        if (btnIcon) btnIcon.className = "fa-solid fa-volume-xmark text-slate-400 text-[9px]";
-      }
-    }
-
     window.onload = () => {
-      // 페이지 로드 시 준비 화면만 출력하고 카운트다운은 대기합니다.
+      // 시작 모달은 노출하고, 미션 모달 및 타이머 동작은 대기
+      document.getElementById('startModal').classList.remove('hidden');
+      document.getElementById('missionModal').classList.add('hidden');
       renderKiosk();
     };
 
@@ -396,7 +317,12 @@
     }
 
     function startMissionTimer() {
+      missionCountdown = 10;
       const cdEl = document.getElementById('modalCountdown');
+      if (cdEl) cdEl.innerText = missionCountdown;
+
+      if (missionInterval) clearInterval(missionInterval);
+      
       missionInterval = setInterval(() => {
         missionCountdown--;
         if (cdEl) cdEl.innerText = missionCountdown;
